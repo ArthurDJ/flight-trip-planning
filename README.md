@@ -76,7 +76,7 @@ Includes the details that usually get missed: "refundable" generally requires ca
 **Claude Code / Claude desktop (local skills)**
 
 ```bash
-git clone https://github.com/<owner>/flight-trip-planning.git
+git clone https://github.com/ArthurDJ/flight-trip-planning.git
 mkdir -p ~/.claude/skills
 cp -r flight-trip-planning/skills/flight-trip-planning ~/.claude/skills/
 ```
