@@ -1,279 +1,82 @@
 ---
-name: "flight-trip-planning"
-description: "规划或审核机票方案时使用：澄清需求、制定硬约束与偏好、区分美加境内与跨境条件、可退改分类、核实与审核规则、输出格式。不含具体查询方法。"
+name: flight-trip-planning
+description: Decide which flight to book when plans may change, refunds must come back as cash, the trip crosses a border, or you are booking for someone else. Compares true total cost, flexibility, connection feasibility and documents, then recommends. Not a fare search engine.
 ---
 
-# 机票规划流程（通用版）
+# Flight decision skill
 
-本 skill 只定义**流程、需求清单和交付标准**，不规定用什么工具或接口查询。适用于：为某位旅客规划机票、写需求文档、评估候选航班、审核另一个 agent 的查询结果。
+## What this skill is for
 
-**执行边界（任何情况都适用）**：只查询和建议，不下单、不付款、不占座、不输入任何账号密码或证件号；遇到登录或验证页面，跳过或交给用户本人处理。
+Search engines answer "what is the cheapest flight?". This skill answers **"which flight should we actually book?"** when the answer depends on things search engines ignore:
 
----
+- **Plans that may change**: pending visas or immigration decisions, job or school dates, family events. Flexibility has a price, and this skill puts a number on it.
+- **Refunds that must come back as cash**, not airline credit (for example, the traveler is moving countries or rarely flies that airline).
+- **Cross-border trips**: entry documents, where customs happens, whether bags must be re-checked at the connection.
+- **Booking for someone else** (a partner, parent, colleague): the traveler needs a short answer they can understand, and the booker needs something they can verify.
 
-## 0. 总流程
+It turns these into hard filters and priced trade-offs, verifies the shortlist on the airline's own site, and hands over a decision. The person books and pays; the agent never does.
 
-| 阶段 | 产出 | 通过条件 |
-|---|---|---|
-| 1. 澄清 | 问题清单的答案 | 第 2 节的必问项都有答案，或明确标为"用户未定" |
-| 2. 需求文档 | 带版本号的需求文档（硬约束 H、偏好 P、输出格式） | 用户逐条确认；版本号和变更记录写在文首 |
-| 3. 前置检查 | 证件 / 身份 / 取消触发条件清单 | 能确认的已确认；未确认的标为"出票前完成" |
-| 4. 定义查询范围 | 航司 × 机场 × 日期组合清单 | 范围按实际航线核定，排除的航司写明理由 |
-| 5. 查询与核实 | 候选行程 + 价格 + 票种 + 退改条款 | 符合第 6 节核实规则 |
-| 6. 评估 | 转机可行性、时差、行李、风险等级 | 符合第 7、8 节 |
-| 7. 输出 | 正式结果文件 + 给旅客的精简版 | 符合第 9 节 |
-| 8. 审核 | 审核意见 | 用第 10 节清单；查询者和审核者最好不是同一个 agent |
-| 9. 出票交接 | 出票步骤清单 | 第 11 节；出票由用户本人完成 |
+## What this skill does NOT do (use existing tools)
 
-需求一旦被用户修改，先更新需求文档、升版本号，再继续往下做；不要只在对话里口头改。
-
----
-
-## 1. 原则
-
-1. **先结论后展开**：每份交付物开头先给推荐和理由。
-2. **前提有误直接指出**：用户或其他 agent 的说法与需求文档、官网数据不一致时，指出差异并说明依据。
-3. **不确定就标注**：推断要给置信度（高 / 中 / 低）和依据；查不到的写"未核实"，不得推测填写。
-4. **规则会变**：行李费、退改条款、入境规则、时区规则都可能变化，执行时以当时官方来源为准，并记录查询时间。
-5. **硬约束不悄悄放宽**：某条硬约束导致无解时，报告"无解"及原因，由用户决定是否放宽。
-
----
-
-## 2. 澄清：必问项
-
-### 2.1 行程基本面
-- 旅客人数、成人 / 儿童、舱位等级
-- 出发地、目的地；可接受的备选机场（以及从各机场到最终目的地的交通方式和车程）
-- 出发窗口：最早 / 最晚日期；某些日期是否有时间限制（如"只能晚上 6 点后"）
-- 返回窗口：最早 / 最晚日期；最晚到达时间；最早出发时间（是否接受早班）
-- 单程最长可接受时长、最多转机次数
-- 是否接受过夜转机、红眼航班
-
-### 2.2 退改与付款
-- 行程被取消或改期的可能性有多大？触发条件是什么？
-- 能否接受航司 credit（代金券）？credit 之后是否用得上（例如旅客即将搬到另一个国家，或很少再坐这家航司）？
-- 付款方式与币种；信用卡权益（返现、保险）是否要计入
-- 价格敏感度：有无上限？价格与其他偏好冲突时怎么取舍？
-
-### 2.3 行李
-- 去程 / 回程分别带什么：只带登机箱、托运几件
-- 是否需要现在就加托运（多数航司可以出票后再加）
-
-### 2.4 证件与身份（跨境必问）
-- 旅客持哪国护照；护照有效期
-- 目的地国的入境资格（签证类别、eTA / ESTA、免签）
-- 返回居住国所需的身份文件是否在行程期间有效
-- 是否有正在审理的移民申请，出行是否会影响申请或现有身份
-
-### 2.5 偏好
-- 航司偏好（会员、credit 可用性、跨国航线覆盖）
-- 机场顺位、接送机安排
-- 中转容错偏好（宁可多花钱换更宽裕的转机？）
-- 优先级顺序：用户必须给出 P1→Pn 的排序，或说明"价差在多少以内才按偏好排"
-
----
-
-## 3. 需求文档模板
-
-```
-# <旅客> <行程> 机票需求文档
-版本：vX.Y（日期，变更摘要）
-背景：为什么要可退改 / 有什么特殊约束
-
-## 一、硬约束（缺一不可）
-H1 出发窗口 …
-H2 返回窗口 …（到达时间按哪个时区计，写明）
-H3 中转与时长 …
-H4 退改类别 …
-H5 行李 …
-H6 出票渠道与票务结构 …
-H7 中转可行性 …
-H8 证件与身份（出票前置条件）…
-
-## 二、行李规则
-## 三、退改分类（A / B / C 定义，见第 5 节）
-## 四、偏好（P1→Pn，写明比较顺序）
-## 五、航司与机场范围（含排除理由）
-## 六、时差规范
-## 七、输出格式
-## 八、执行边界（只查询，不下单）
-## 九、不纳入评估的因素
-```
-
-编写要点：
-- 硬约束之间不得冲突（例如 H4 要求"可退现金"，就不能在别处把"只退 credit"算作合格）。
-- "同一张票"写清楚含义：一次下单、同一 PNR（订座记录编号），允许含合作伙伴运营航段；同一航司分两次下单不算。
-- 每条约束能被机械检查（有数字、有时区、有判定方法）。
-- 偏好排序如果会导致明显不合理的结果（为几分钟车程多付几百美元），在文档里加价差阈值。
-
----
-
-## 4. 场景模块：境内 vs 跨境
-
-先判断行程属于哪一类，再把对应条件写进 H7、H8 和时差规范。下列规则可能变化，执行时核实。
-
-### 4.1 美国境内
-
-| 维度 | 需要考虑的条件 |
+| Need | Use instead |
 |---|---|
-| 证件 | 18 岁以上需 REAL ID 合规证件或护照等 TSA 认可证件；非美籍旅客带护照 |
-| 海关 | 无海关、无入境审查；中转只需在安检区内换登机口（极少数航站楼间需重新安检） |
-| 退改保护 | DOT 24 小时规则：在航司直订、距起飞 7 天以上的票，出票 24 小时内可全额退；航司取消或重大变更时乘客有权退款（不接受改签时） |
-| 票种 | Basic Economy 通常不可改、可能不含登机箱 / 选座；Main 多为免费改签、取消退 credit；可退现金需选 Refundable 票价 |
-| 行李 | 主流航司托运单独收费，网上提前付通常比机场便宜；以付款时页面为准 |
-| 时区 | 美国本土 4 个时区 + 阿拉斯加、夏威夷；亚利桑那大部分不实行夏令时；跨时区航班必须标两地时间 |
-| 中转 | 国内转国内一般 45–90 分钟可行；大型枢纽换航站楼要更多时间；冬季北部枢纽（雪、冰冻）延误风险高 |
-| 运营 | 支线航班（regional）常由合作公司运营，小飞机登机箱可能在登机口托运 |
+| Live fare search, cheapest dates, nearby airports | Google Flights (date grid, price graph), Skyscanner, Kayak |
+| Price tracking and drop alerts | Google Flights / Google AI Mode "track prices", Kayak alerts |
+| Buy-or-wait prediction, price freeze | Hopper, Kayak price forecast (not guaranteed) |
+| Award / miles search | Airline sites, Google AI Mode miles, dedicated award tools |
+| Deciding refund vs credit vs claim **after** booking | A post-booking refund-decision skill |
 
-### 4.2 加拿大境内
+Treat these tools as **discovery**. Their results are leads, never final prices.
 
-| 维度 | 需要考虑的条件 |
-|---|---|
-| 证件 | 18 岁以上需政府签发的有效证件；外籍旅客带护照 |
-| 海关 | 无海关；中转在安检区内完成 |
-| 退改保护 | APPR（加拿大航空乘客保护条例）：航司原因取消且无法在规定时间内改签时，乘客可要求退回原支付方式；延误赔偿按航司规模和原因区分 |
-| 票种 | 各航司经济舱分档不同；部分航司经济舱没有可退现金的票种，只有高端舱可退，需逐家核实 |
-| 行李 | 低价票可能不含登机箱；低成本航司附加费多，比价要计全成本 |
-| 时区 | 横跨 6 个时区，纽芬兰为半小时时区；萨斯喀彻温大部分不实行夏令时；省级时区政策可能调整（例如 BC 省已改为全年固定 UTC-7），执行时核实 |
-| 中转 | 冬季大雾、降雪对中小机场影响大；小机场每天班次少，错过衔接可能要等到第二天 |
+## Modes
 
-### 4.3 美国 ⇄ 加拿大跨境
+Pick the lightest mode that fits. Escalate only when a trigger appears.
 
-| 维度 | 需要考虑的条件 |
-|---|---|
-| 证件 | 有效护照（或 NEXUS 等可替代证件，按国籍适用）；按国籍确认美国签证类别 / ESTA、加拿大 TRV / eTA；签证类别要与入境目的相符（探亲旅游 vs 商务） |
-| 返回居住国 | 加拿大非公民居民：确认 PR 卡 / PRTD、或工签 / 学签 + 有效 TRV 在返程时有效；坐飞机返加时航司会查 |
-| 移民申请进行中 | 出境会不会影响审理中的申请或靠"申请在审"维持的身份；登陆（landing）与出行时间如何衔接；必要时把"申请结果提前下来"写成取消触发条件 |
-| 去美国的入境地点 | 加拿大大型机场设有美国预清关（preclearance），在出发地过美国海关，到美国后按国内到达；小机场没有，需在第一个美国机场过 CBP，再重新安检转机 |
-| 去加拿大的入境地点 | 在第一个加拿大机场过 CBSA；国际转国内时，部分机场需提取托运行李、过关后重新交运，再安检，转机时间要相应加长；在美国转机飞加拿大时，行李一般直挂，到加拿大入关 |
-| 退改保护 | 往返美国的航班适用 DOT 24 小时规则；进出加拿大的航班适用 APPR；第三方平台不一定受 24 小时规则约束 |
-| credit 可用性 | 搬家或常住地变化时，评估各航司在新居住地的航线覆盖；纯本国低成本航司的 credit 可能用不上 |
-| 计价 | 票价和行李费按始发地币种计价，回程从另一国出发时币种可能不同 |
-| 时区 | 两国时区规则不同步（夏令时切换、省 / 州固定时区），行程期间两地时差可能与平时不同，必须按出行日期核实 |
-| 联程结构 | 跨航司拼接的组合多为分开出票，误机无保护、行李要重新托运；默认只接受单一 PNR |
+| Mode | When | Questions | Output |
+|---|---|---|---|
+| **Quick** (default for simple trips) | Domestic, fixed dates, no special constraints | 3–5 | Top 3 comparison card + recommendation |
+| **Standard** | Any of: uncertain plans, cross-border, booking for others, more than 2 travelers | 6–10 | Comparison table, trade-off notes, traveler summary |
+| **Thorough** | High stakes, many date/airport combinations, or a second agent will audit | Full intake | Versioned requirements doc, full result file, audit, booking record |
 
-### 4.4 其他国际行程（简要）
-- 护照有效期常要求覆盖入境后 6 个月
-- 转机国可能需要过境签证，即使不出机场
-- 长途中转的过夜、换机场、换航站楼
-- 各国退改保护规则不同（如欧盟 EU261），按航段适用
+Escalation triggers: the traveler might cancel; a border is crossed; a connection depends on a once-a-day flight; immigration or visa status is pending; the person asks for a review of another agent's work.
 
----
+## Workflow
 
-## 5. 退改分类
+1. **Intake.** Ask only what changes the decision. Use defaults for the rest and state them. See `references/templates.md` → Intake.
+2. **Choose a preference profile** (or let the person write their own). Profiles say how much extra money is worth what. See `references/decision-framework.md` → Profiles.
+3. **Set hard filters**: date and time windows (with the time zone named), maximum duration and stops, refundability class, baggage, single ticket, documents.
+4. **Discover** candidates with the person's search tool. Cover every date in the window and every time of day; work backwards from the scarcest leg (see `references/verification.md` → Backward planning).
+5. **Verify the shortlist on the airline site**: price, fare class, refund and change terms in the airline's words, query time. See `references/verification.md`.
+6. **Normalize to true total cost** and **price the flexibility** (refundable vs credit vs basic). See `references/decision-framework.md`.
+7. **Assess feasibility**: each connection step, border rules, documents, time zones, scarce-leg risk. Apply the region module that fits (`references/regions.md`).
+8. **Decide and explain**: top 3 with the trade-off in money ("pays $27 more to arrive in daylight"), plus why the cheaper or closer options lost.
+9. **Hand over**: traveler summary, a self-contained message for any other agent, and a booking checklist. After the person books, run the **post-booking check**.
 
-| 类别 | 定义 | 默认地位 |
-|---|---|---|
-| **A 类** | 可改签 + 取消**退回原支付方式** | 取消概率高、或 credit 用不上时必选 |
-| **B 类** | 可改签 + 取消只退航司 credit | 次选；须标注 credit 有效期和可用范围 |
-| **C 类** | 不可改签，或取消即作废 / 只退部分 | 一般排除 |
+## Core rules
 
-必须向用户讲清的细节：
-- **"可退"通常以起飞前操作为条件**：起飞前取消才退；不登机也不取消（no-show）可能失去退款资格。
-- **改签**：免改签费不等于免差价，差价按改签当天票价计算；改到更便宜的航班，差额是退现金还是转 credit，按条款核实。
-- **部分使用**：去程已飞、取消回程能退多少，按条款核实。
-- **头等 / 商务 / 高端经济舱不一定可退**：很多航司的高端舱普通票同样只退 credit，可退需另选 Refundable 版本。
-- **退款到账时间**与**信用卡返现被扣回**：退款原路退回，返现通常同时扣回。
-- **信用卡行程取消险**一般只赔不可退票，且理赔原因有限（疾病、死亡等），通常不覆盖"计划变动"；CFAR（任何原因取消）保险通常只退 50–75%。
-- **24 小时规则**可作为出票后的最后确认窗口。
+1. **Conclusion first.** Every deliverable opens with the recommendation.
+2. **Never book, pay, hold seats, log in or enter credentials.** Skip login and verification pages; leave them to the person.
+3. **Never take over a browser tab the person is using.** Open a new tab and close it when done.
+4. **Third-party results are leads.** Final price, fare class and refund terms come from the airline's own site for the same itinerary.
+5. **Same unit or no comparison.** Do not put one-way and round-trip, refundable and non-refundable, or with-bags and without-bags prices in one column without a "basis" column.
+6. **State confidence** (high / medium / low) and the reason for every inference; write "unverified" instead of guessing.
+7. **Do not relax a hard filter silently.** Report "no result" and why; the person decides.
+8. **Rules change.** Baggage fees, refund policies, entry rules and time zones are checked at run time and the query time is recorded.
+9. **Two time zones, always.** Any departure or arrival that crosses zones is written "local time (other place's time)".
 
-可退票的价值：**价格下跌时可以先取消、确认退款，再按新价重订**（先退后订，避免同名重复占座）。
+## Outputs
 
----
+- **Comparison card** (all modes): top 3, true total, refundability class, times in both zones, connection time and risk, one-line trade-off each.
+- **Traveler summary** (Standard+): plain language, top 3 only, 3–5 notes (how to cancel, bags, documents).
+- **Handoff message** (when another agent is involved): self-contained; never refer to files the other agent cannot open.
+- **Full result file and audit** (Thorough).
+- **Booking record** after the post-booking check.
 
-## 6. 核实规则
+Templates are in `references/templates.md`.
 
-1. **第三方聚合平台只用来发现航班组合**；价格、票种（fare class）、退改条款必须回航司官网，用同一组航班重新确认，附官网链接。
-2. 官网查不到、或价格不一致的行程，不得列入结果。
-3. 每个价格记录：查询时间、是否含税、是否含行李、币种、是"起价"还是"选定后的总价"。
-4. 退改条款尽量引用官网原文（短句），并注明出处页面。
-5. 结果整齐得可疑（多个日期价格完全相同）时，在官网页面抽查至少一格并记录结果。
-6. "仅剩 N 座"指该价位的剩余数量，不等于航班满座；卖完会跳到更高价位。
-7. 不同口径的价格（单程 vs 往返、可退 vs 不可退、含 vs 不含行李）不得放在同一列直接比较；必须比较时加"口径"列。
-8. 查询过程中遇到登录、验证码、身份验证页面：不输入任何信息，跳过或请用户本人处理，并记入查询记录。
+## Reference files
 
----
-
-## 7. 转机与行李评估
-
-### 7.1 流程拆解
-对每个转机点，写出旅客要完成的步骤并估算耗时：下机（支线机门口取行李）→ 步行 / 轨道交通 → 入境海关（如适用）→ 提取并重新交运托运行李（如适用）→ 重新安检（如适用）→ 走到下一登机口 → 登机截止（通常起飞前 15–20 分钟）。
-
-### 7.2 风险分级参考
-- **低**：所需流程正常耗时 + 30 分钟以上余量
-- **中低**：余量 15–30 分钟，或流程简单但时间偏短
-- **中**：需过海关或重新交运行李且余量不足 30 分钟；或节假日 / 冬季高峰
-- **高**：余量低于正常耗时，或依赖前段准点
-
-### 7.3 必查的关键风险点
-- **后段班次稀少**：转机后的航段每天只有一两班时，错过的后果（晚到几小时 vs 次日 vs 违反硬约束）要单独写出。
-- 去程和回程分别评估：错过后果不同，风险权重不同。
-- 季节因素：冬季雾、雪、冰冻；节假日海关和安检排队。
-- 入境审查的不确定性：新签证、首次入境可能被二次询问，无法预测，应留余量。
-- 托运行李是否直挂终点；分开出票时一律视为需要重新托运。
-
-### 7.4 降低风险的建议（写给旅客）
-只带登机箱、坐靠前座位、证件随手可取、装航司 App 看登机口、前段延误时主动联系航司改签。
-
----
-
-## 8. 时差规范
-
-1. 所有跨时区起降时间写成"当地时间（另一地时间）"。
-2. 按**出行日期**核实两地 UTC 偏移，注意夏令时切换日和地区性固定时区政策。
-3. 硬约束里的时间（如"20:00 前到达"）写明按哪地时间计。
-4. 单程总时长以航司给出的实际经过时间为准，不用两地钟面时间直接相减。
-5. 接送机时间按接送人所在地的当地时间给出。
-
----
-
-## 9. 输出格式
-
-### 9.1 正式结果文件（给决策者和审核者）
-章节顺序固定，没有内容写"无"：
-1. **结论**：推荐前 3 条，每条一句理由（对应哪几条偏好胜出）；如果严格按偏好排序的结果不合理，说明并给出建议顺序
-2. **候选行程总表**：航司 / 航班号 / 运营方、去回程时刻（两地时间）、中转机场与时长与风险等级、单程总时长、票种、A 类价、B 类参考价、行李费、总价、credit 有效期（仅 B 类）、到达机场与车程、官网链接
-3. **价格矩阵**（出发日 × 回程日，按机场分组）与**舱位对比**（如适用）
-4. **逐条中转评估**
-5. **排除清单**：每条写违反的约束编号或排除理由
-6. **特殊日期结论**：需求里有特殊限制的日期，明确写"有解"或"无解"及依据
-7. **查询记录**：查了哪些官网、哪些组合、时间；遇到的登录或报错；**未能核实的信息**
-
-### 9.2 给旅客的精简版
-- 只放最终前 3（至多前 5）个方案
-- 每个方案：价格（含行李）、去回程起降时间（两地时间）、转机时长、一两个标签（如"最便宜""回程转机较紧"）
-- 结尾 3–5 条注意事项：退改条件、起飞前取消、行李、证件
-- 不放矩阵、排除清单、技术术语
-
-### 9.3 可视化（可选）
-价格矩阵适合做热力图；舱位对比适合分组条形图；所有数字须注明口径。
-
----
-
-## 10. 审核清单（审核另一个 agent 的结果）
-
-- [ ] 是否按最新版需求文档执行？引用的偏好是否来自旧版本？
-- [ ] 查询范围是否完整：所有备选机场、出发 / 回程窗口内每一天、每个时段（早班常被漏掉）？
-- [ ] 每个价格是否官网核实，口径是否写清（含税、含行李、单程 / 往返、可退 / 不可退）？
-- [ ] 退改分类是否正确？高端舱是否被误当作可退？
-- [ ] 价差、总价等算术是否正确？
-- [ ] 时差是否按出行日期核实并标两地时间？
-- [ ] 转机评估是否覆盖海关、重新交运、班次稀少风险？
-- [ ] 排除清单、特殊日期结论、查询记录是否齐全？
-- [ ] 有无"改期不用补差价""肯定能赶上"这类无依据的保证？
-- [ ] 可疑的整齐数据是否抽查过？
-
-审核意见按"成立 / 部分成立 / 不成立 + 依据 + 处理方式"逐条回应；合并两份结果时，结构取更完整的一方，数据取覆盖更全且核实过的一方，并注明来源。
-
----
-
-## 11. 出票交接清单（给用户本人执行）
-
-1. 在航司官网打开对应日期的搜索页，按推荐方案选择航班和票种（可退票需选对应选项，确认总价）
-2. 乘客姓名与护照完全一致
-3. 选定付款卡（退款将原路退回）
-4. 付款前截图退改条款
-5. 托运行李可出票后在管理行程或值机时添加
-6. 出票后 24 小时内是最后的免费取消窗口
-7. 决定不去时，**在起飞前**于官网取消，不要直接不登机
-8. 出发前完成第 2.4 节所有证件核对
+- `references/decision-framework.md`: true total cost, preference profiles, flexibility math, price dynamics, payment cards.
+- `references/verification.md`: airline-site verification, backward planning, connection assessment, time zones, audit checklist.
+- `references/regions.md`: global checks, North America module (US domestic, Canada domestic, US ⇄ Canada), other regions.
+- `references/templates.md`: intake questions, requirements doc, comparison card, traveler summary, handoff message, booking and post-booking checklists.
