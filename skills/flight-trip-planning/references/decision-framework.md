@@ -41,21 +41,39 @@ Fare classes (names vary by airline; check each airline's fare families):
 
 | Class | Change | Cancel |
 |---|---|---|
-| **A: Refundable** | Allowed, pay fare difference | Refund to original form of payment |
+| **A: Refundable** | Allowed, pay fare difference | Refund to original form of payment (sometimes minus a fee) |
 | **B: Changeable** | Allowed, pay fare difference | Airline credit (expiry and who may use it vary) |
 | **C: Basic** | Not allowed or high fee | Forfeit or partial credit |
 
 ### Break-even test (A vs B)
 
+Inputs: `R` = price of A, `C` = price of B, `P` = probability the trip is cancelled, `f` = share of a B credit that would go unused (expires, or the airline does not fit the traveler's future travel).
+
 ```
-premium          = price(A) − price(B)
-credit_at_risk   = price(B) × (share of the credit you expect NOT to use before it expires)
-choose A if      P(cancel) × credit_at_risk > premium
+trip happens  (1 − P):  A costs R,  B costs C
+trip cancelled (P):     A is refunded → costs 0;  B leaves a credit worth (1 − f)·C → loses f·C
+
+E[cost A] = (1 − P)·R
+E[cost B] = (1 − P)·C + P·f·C
+
+choose A if (1 − P)·(R − C) < P·f·C
+         ⇔ P > P* = (R − C) / ((R − C) + f·C)
 ```
 
-Example: premium $156, B price $501. If an unused credit would be fully wasted, A wins when P(cancel) > 31%. If the credit will almost surely be used, A rarely wins.
+The premium `R − C` is only spent if the trip happens: cancelling A refunds the premium too. (v2 compared `P·f·C` with the whole premium, which overstates the threshold.)
 
-Questions that set `credit_at_risk`:
+Example: R − C = $156, C = $501.
+- Credit would be fully wasted (f = 1): P* = 156 / (156 + 501) = 156 / 657 ≈ 23.7%. A wins if the chance of cancelling is above about 1 in 4.
+- Half the credit would be used (f = 0.5): P* = 156 / (156 + 250.5) ≈ 38.4%.
+- Credit will surely be used (f ≈ 0): A almost never wins.
+
+Variants:
+- **A has a cancellation fee `x`** (refund minus a fee): E[cost A] = (1 − P)·R + P·x, so P* = (R − C) / ((R − C) + f·C − x). With x = $100 in the example: 156 / 557 ≈ 28.0%. If x ≥ f·C, A never wins.
+- **The likely event is a date change, not a cancellation**: a change keeps the trip, so it belongs in the "trip happens" branch. If both fares allow changes for the fare difference, the change costs the same on A and B and the premium buys nothing for it; use only the probability of a real cancellation as `P`. If B charges a change fee `g` that A does not, add `P_change·g` to E[cost B]: choose A if (1 − P)·(R − C) < P·f·C + P_change·g.
+
+Show the inputs (R, C, P, f, and x or g if used) and the result next to the recommendation, so the person can change an input and redo the sum. Use a calculator or code when available.
+
+Questions that set `f` (the share of credit that would go unused):
 - Does this airline fly from where the traveler will live in the next 12 months?
 - How long is the credit valid, and can it be used to book for someone else?
 - Would the traveler **change** the date instead of cancelling? Changing a B fare usually avoids credit entirely (pay only the fare difference).

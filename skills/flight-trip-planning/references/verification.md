@@ -60,6 +60,7 @@ Advice for the traveler: carry-on only when possible, sit near the front, keep d
 - [ ] Every price verified on the airline site, with basis stated (taxes, bags, one-way/round-trip, refundable or not)
 - [ ] Refundability classes correct; premium cabins not assumed refundable
 - [ ] Arithmetic (differences, totals) correct
+- [ ] Break-even uses P* = (R − C) / ((R − C) + f·C), with the inputs shown (not P·f·C > R − C)
 - [ ] Time zones checked for the travel dates and shown in both zones
 - [ ] Connections assessed for customs, bag re-check and scarce-leg risk
 - [ ] Exclusion list, special-date conclusions and query log present
