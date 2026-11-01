@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: breakeven-cash-refund
+expected_outcome: |
+  Uses the corrected break-even model (cancelling the refundable fare refunds the premium too): threshold about 23.7% (156 / 657), so at a 25% cancellation chance with a credit that would be wasted, the refundable fare is the better choice. Mentions cancelling before departure or changing instead of cancelling, and leaves booking to the person.

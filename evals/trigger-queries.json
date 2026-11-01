@@ -1,0 +1,82 @@
+[
+  {
+    "query": "my parents are flying Shanghai to Vancouver via Seattle next month on one ticket. do they need to pick up their bags in Seattle? it's a 1h50 layover and they don't speak much English",
+    "should_trigger": true
+  },
+  {
+    "query": "Basic economy is $214 and main cabin $268 on the same Delta flight BOS-ATL for my sister. She might have to cancel if her surgery date moves. which one should she get?",
+    "should_trigger": true
+  },
+  {
+    "query": "can you compare these 3 flights I found for Calgary to Toronto on Dec 22 and tell me which makes most sense? we have a toddler and 2 big suitcases. WestJet 7:05 $289, Air Canada 9:30 $335, Flair 6:00 $149",
+    "should_trigger": true
+  },
+  {
+    "query": "another agent gave me this flight plan for my trip to Montreal (attached below), can you double check it before I pay",
+    "should_trigger": true
+  },
+  {
+    "query": "帮我看看下周五从温哥华到多伦多的机票，带一个托运箱，哪个比较划算",
+    "should_trigger": true
+  },
+  {
+    "query": "Is a 55 minute connection in Toronto enough going Halifax to Newark? same Air Canada booking",
+    "should_trigger": true
+  },
+  {
+    "query": "flying SFO to JFK thursday morning, just want something reasonable, nonstop if possible",
+    "should_trigger": true
+  },
+  {
+    "query": "I'm on a work permit in Canada waiting on PR and need to fly to Boston for a conference in March. refundable ticket or not? anything about re-entry I should think about before booking?",
+    "should_trigger": true
+  },
+  {
+    "query": "Kayak shows a hacker fare Toronto-Newark-Lisbon that's $200 cheaper than the TAP nonstop. worth it?",
+    "should_trigger": true
+  },
+  {
+    "query": "open jaw question: Chicago into Rome, home from Paris, 2 people in June. how do I compare that against two round trips?",
+    "should_trigger": true
+  },
+  {
+    "query": "plan a 7-day itinerary for Japan in April, which cities should I visit and how many nights each",
+    "should_trigger": false
+  },
+  {
+    "query": "United cancelled my flight yesterday, how do I file a DOT complaint about how they handled it?",
+    "should_trigger": false
+  },
+  {
+    "query": "find me a hotel near LAX with a shuttle, I have a 6am flight on Saturday",
+    "should_trigger": false
+  },
+  {
+    "query": "what's the carry-on size limit on Air Canada?",
+    "should_trigger": false
+  },
+  {
+    "query": "write a python script that scrapes google flights prices every day and emails me when YVR-LHR drops below $900",
+    "should_trigger": false
+  },
+  {
+    "query": "how many Aeroplan points do I need for business class to Tokyo, and which partner gives the best redemption?",
+    "should_trigger": false
+  },
+  {
+    "query": "track the price of YVR to LHR in July for me and tell me when it drops",
+    "should_trigger": false
+  },
+  {
+    "query": "my checked bag didn't arrive in Denver on my Southwest flight, what are my rights?",
+    "should_trigger": false
+  },
+  {
+    "query": "explain how airline overbooking works and why airlines do it",
+    "should_trigger": false
+  },
+  {
+    "query": "what's the time difference between Vancouver and Toronto right now?",
+    "should_trigger": false
+  }
+]

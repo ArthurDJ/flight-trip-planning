@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: audit-other-agent-errors
+expected_outcome: |
+  Point-by-point audit that catches the three planted errors (one-way vs round-trip comparison, premium economy assumed refundable, Phoenix time-zone error in July) and the tight connection, with a fix for each.

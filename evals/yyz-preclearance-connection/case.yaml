@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: yyz-preclearance-connection
+expected_outcome: |
+  Recognises US preclearance at Toronto as a step of this connection, breaks the connection into steps with a risk grade, explains that a single-ticket connection meets the minimum connection time but legal is not comfortable, and weighs the $60 option in money.

@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: quick-domestic-stays-short
+expected_outcome: |
+  Quick mode: a recommendation with at most 2 questions, a compact list of at most 3 options with trade-offs in money (basic economy restrictions), a note to confirm on the airline site, and no heavy deliverables.

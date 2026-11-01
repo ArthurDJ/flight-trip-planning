@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: yvr-sea-pickup-time
+expected_outcome: |
+  Knows that British Columbia stays on UTC-7 year-round from 2026-11-01, so in December Vancouver is 1 hour ahead of Seattle (UTC-8): landing is about 16:55 Seattle time. Explains US preclearance at YVR (no customs at SEA).

@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: no-browser-pasted-results
+expected_outcome: |
+  Works from the pasted data, labels every price unverified, excludes the separate-ticket hacker fare with reasons (no protection, bag re-check, US entry at Newark), adds bags for 2 travelers in 2 directions without inventing fees, and gives a verification checklist.
