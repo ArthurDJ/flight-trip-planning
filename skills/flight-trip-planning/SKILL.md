@@ -58,7 +58,7 @@ Escalation triggers: the traveler might cancel; a border is crossed; a connectio
 | 8. Decide and explain | Top 3, trade-off in money | Same + why cheaper or closer options lost | Same |
 | 9. Hand over (`references/templates.md`) | Compact card | + traveler summary, booking checklist | + full result file, audit, post-booking check |
 
-Quick mode stays short: no requirements doc, no region module unless a rule applies, about a screen of output.
+Quick mode stays short. Budget: about 250 words in total, made of the compact card, a one-sentence recommendation, at most 2 questions (only ones whose answer would change the pick) and at most 2 short notes. No requirements doc, no region module unless a rule applies, and no booking checklist: offer it in one line instead.
 
 ## When tools are missing
 
