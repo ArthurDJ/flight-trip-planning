@@ -7,7 +7,7 @@ Compare options on what the trip actually costs, not the headline fare.
 | Component | Include when | Notes |
 |---|---|---|
 | Fare incl. taxes | Always | From the airline site, same itinerary, same fare class |
-| Checked bags | The traveler will check bags on any leg | Per direction; price at the time bags are added; often cheaper online than at the airport |
+| Checked bags | The traveler will check bags on any leg | Per bag × traveler × direction; price at the time bags are added; often cheaper online than at the airport |
 | Carry-on | The fare excludes it (basic / ultra-low-cost fares) | |
 | Seat selection | The traveler needs seats together or a specific seat | |
 | Ground transport | Airports differ in distance from the real destination | Parking, rideshare, tolls, or a pickup driver's time |
@@ -21,17 +21,26 @@ A profile replaces a strict priority order (strict orders produce absurd results
 
 | Profile | Price | Flexibility | Connection safety | Schedule comfort | Airport convenience |
 |---|---|---|---|---|---|
-| **Budget** | Dominant | Basic fares allowed if plans are firm | Accept legal minimum | Red-eyes and early starts OK | Low |
-| **Balanced** (default) | High | Changeable fare | ≥ comfortable buffer | Avoid red-eyes | Medium |
+| **Budget** | Dominant | Basic fares allowed if plans are firm | Accept the minimum connection time ("legal connection") | Red-eyes and early starts OK | Low |
+| **Balanced** (default) | High | Changeable fare | At least a comfortable buffer | Avoid red-eyes | Medium |
 | **Comfort** | Medium | Changeable | Generous buffer | Daytime, fewer stops | High |
 | **Uncertain plans** | Medium | **Refundable to original payment, or a credit the traveler will surely use** | Generous buffer | Medium | Low |
 | **Family / group** | Medium | Changeable | Generous buffer, no tight self-transfers | Avoid very early starts | High |
 
-Default exchange rates for **Balanced** (the person may change any of them):
-- Nonstop vs one stop: worth up to $100 per person
-- Daytime arrival vs late night: worth up to $50
-- Preferred airport vs another within the acceptable list: worth up to $40
-- Connection buffer above the comfortable minimum: worth up to $30 per extra 30 minutes when the next flight is the last of the day
+Default exchange rates: the most extra money each improvement is worth (the person may change any of them).
+
+| Improvement | Unit | Budget | Balanced | Comfort | Uncertain plans | Family / group |
+|---|---|---|---|---|---|---|
+| Nonstop instead of one stop | per person | $30 | $100 | $200 | $100 | $75 |
+| Daytime arrival instead of late night | per booking | $15 | $50 | $100 | $50 | $100 |
+| Preferred airport instead of another acceptable one | per booking | $10 | $40 | $80 | $40 | $60 |
+| 30 more minutes of connection buffer when the next flight is the last of the day | per booking | $10 | $30 | $60 | $50 | $60 |
+| No red-eye and no departure before 07:00 | per person | $0 | $40 | $80 | $40 | $60 |
+
+- Flexibility is not on an exchange rate: choose the fare class with the break-even test under Flexibility below. The Uncertain plans profile always runs it; the others run it when the person says plans may change.
+- Per person × travelers gives the booking amount: a nonstop worth $75 per person is worth $300 to a family of 4.
+- The amounts suit fares of a few hundred dollars. For long-haul or premium fares, offer to scale them and let the person set the numbers.
+- A hard filter is not an exchange rate: "kids must sit with us" is a filter, and its cost goes into the true total.
 
 Write the trade-off in money for every recommendation: "Option B costs $27 more and arrives at 13:17 instead of 19:38."
 
