@@ -1,6 +1,9 @@
 ---
 name: flight-trip-planning
 description: Use this skill whenever someone needs to decide which flight or fare to book, compare flight options or fare types (basic vs main vs refundable), check whether a connection or a cross-border itinerary works, or review flight options that another person or agent found. This includes simple requests like "find me a reasonable flight from X to Y". It matters most when plans may change, a refund must come back as cash, the trip crosses a border (US/Canada preclearance, customs, bag re-check), or someone is booking for another person. It verifies third-party prices on the airline's site, prices flexibility in money, and never books or pays. Not for hotels or full trip itineraries, and not for refund or compensation claims on a flight already booked or cancelled.
+license: MIT. LICENSE.txt has complete terms
+metadata:
+  version: "3.0.0"
 ---
 
 # Flight decision skill
