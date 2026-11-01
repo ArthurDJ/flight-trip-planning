@@ -1,120 +1,152 @@
+English | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md)
+
+> **Note:** This repository contains a skill for Claude. For information about the Agent Skills standard, see [agentskills.io](https://agentskills.io).
+
 # flight-trip-planning
 
-**A Claude skill for deciding which flight to book when the cheapest one is not the right answer.**
+A skill that helps Claude decide **which flight to book** when the cheapest one is not the right answer. It sits on top of flight search tools: it turns their results into a decision that someone else can check, verifies prices on the airline's own site, and puts a money value on flexibility. It never books, pays or logs in.
 
-Built for four situations that flight search engines ignore:
+The repository ships the same skill in two languages: `skills/flight-trip-planning` (English instructions) and `skills/flight-trip-planning-zh` (Chinese instructions). Install one of them.
+
+For more information about skills, check out:
+- [What are skills?](https://support.claude.com/en/articles/12512176-what-are-skills)
+- [Using skills in Claude](https://support.claude.com/en/articles/12512180-using-skills-in-claude)
+- [How to create custom skills](https://support.claude.com/en/articles/12512198-creating-custom-skills)
+
+# What the skill does
+
+Search engines answer "what is the cheapest flight?". This skill answers "which flight should we actually book?", and it is built for four situations that search engines ignore:
 
 | Situation | What the skill does |
 |---|---|
-| **Plans may change** (pending visa or immigration decision, job or school dates, family events) | Prices flexibility: refundable vs credit vs basic, with a break-even test |
-| **Refunds must come back as cash** (moving countries, rarely flying that airline) | Separates "refund to original payment" from "airline credit" and checks whether a credit would really be used |
-| **Cross-border trips** | Checks entry documents, where customs happens, preclearance, bag re-check at connections, once-a-day legs, time zones |
-| **Booking for someone else** | Produces a plain-language summary for the traveler and a verifiable result for the booker |
+| **Plans may change** (pending visa or immigration decision, job or school dates, family events) | Prices flexibility with a break-even test: refundable vs changeable vs basic |
+| **Refunds must come back as cash** (moving countries, rarely flying that airline) | Separates "refund to the original payment" from "airline credit" and checks whether a credit would really be used |
+| **Cross-border trips** | Checks entry documents, where customs happens, US preclearance, bag re-check at connections, once-a-day legs and time zones |
+| **Booking for someone else** | Writes a plain-language summary for the traveler and a verifiable result for the booker |
 
-It does **not** search fares, predict prices or book tickets. It sits on top of the tools that do, and turns their results into a decision.
+Every recommendation states its trade-off in money ("$27 more to arrive in daylight"), so it can be checked and argued with.
 
-> 中文说明见下方。The repo ships an English skill and a Chinese skill with the same content.
+## When it triggers
 
-## How it works
+- Choosing between flights or fare types (basic, main, refundable), including simple requests such as "find me a reasonable flight from X to Y"
+- Checking whether a connection or a cross-border itinerary works
+- Reviewing flight options that another person or agent found
 
-1. **Ask only what changes the decision**, with defaults (3–5 questions in Quick mode)
-2. **Pick a preference profile**: Budget, Balanced, Comfort, Uncertain plans, Family. Each profile states how much extra money is worth a nonstop, a daytime arrival, a closer airport or a safer connection
-3. **Set hard filters**: dates and times (with time zones), duration, stops, refundability, bags, single ticket, documents
-4. **Discover** with your search tool, then **verify the shortlist on the airline's own site** (price, fare class, refund terms)
-5. **Compare true total cost** (fare, bags, seats, ground transport) and **price the flexibility**
-6. **Check feasibility**: each connection step, border rules, scarce legs, both time zones
-7. **Recommend the top 3** with trade-offs in money ("$27 more to arrive in daylight")
-8. **Hand over**: traveler summary, booking checklist, and a **post-booking check** of the confirmation
+## When it does not
 
-Three modes: **Quick** (simple domestic trips), **Standard** (any of the four situations above), **Thorough** (requirements doc, full result file, second-agent audit).
+- Hotels or full trip itineraries
+- Refund, credit or compensation claims on a flight that is already booked or was cancelled by the airline
+- Live fare search, price tracking and buy-or-wait forecasts (use Google Flights, Kayak, Skyscanner or Hopper; the skill uses their results as leads)
+- Points optimization and fare tricks such as hidden-city or "hacker fare" tickets
 
-## Use it with, not instead of
+# Modes
 
-| Need | Recommended tool |
-|---|---|
-| Fare search, cheapest dates, nearby airports | Google Flights, Skyscanner, Kayak |
-| Price tracking and alerts | Google Flights / Google AI Mode, Kayak |
-| Buy-or-wait forecasts, price freeze | Hopper, Kayak |
-| Award and miles search | Airline sites, Google AI Mode, award tools |
-| Refund vs credit vs claim **after** booking | A post-booking refund-decision skill |
+| Mode | Used for | Questions | Output |
+|---|---|---|---|
+| **Quick** | Domestic trips with fixed dates and no special constraints | 0–2, only what the message leaves out | A compact card with the top 3 and one recommendation, about 250 words |
+| **Standard** | Uncertain plans, cross-border trips, booking for others, more than 2 travelers | 6–10 | Comparison table, trade-offs, a summary for the traveler |
+| **Thorough** | High stakes, many date and airport combinations, or a second agent auditing the result | Full intake | Versioned requirements doc, full result file, audit checklist, booking record |
 
-Aggregator results are treated as leads. Separate-ticket "hacker fares", virtual interlining and hidden-city tickets are excluded by default.
+# Preference profiles
 
-## Who it is for
+Instead of a strict priority order, each profile is a set of exchange rates: how much extra money an improvement is worth. There are five profiles: **Budget**, **Balanced** (default), **Comfort**, **Uncertain plans** and **Family / group**. For example, Balanced values a nonstop at up to $100 per person and a daytime arrival at up to $50. Every rate can be changed.
 
-- People booking for a partner, parent or colleague
-- Travelers whose plans depend on a pending decision
-- US / Canada travelers, including cross-border trips (a full North America module is included; other regions have starter checklists)
-- Multi-agent setups where one agent searches and another audits
+Fare flexibility is decided by a break-even test, not a rate. With a refundable fare at $657 and a changeable fare at $501 whose credit would go unused, the refundable fare wins when the chance of cancelling is above 156 / 657 ≈ 23.7%.
 
-**Not for**: automatic booking or payment, points optimization, fare hacks, live price monitoring.
+# Example prompts
 
-## Requirements
+- "Booking Vancouver to Beijing for my wife. Standard is $501 with credit on cancel, Latitude is $657 refundable. About a 25% chance her visa is late, and we're moving to Germany. Which fare?"
+- "Is a 75-minute connection in Toronto OK going Saskatoon to Chicago on one Air Canada ticket?"
+- "need a flight SFO to LAX next friday morning, carry-on only, just something reasonable"
+- "We're 2 adults and 2 kids with 4 checked bags, Toronto to Cancún. Which of these three options is really cheapest?"
+- "Another agent prepared this flight plan. Please check it before I book."
 
-| Item | Required? | Notes |
-|---|---|---|
-| An agent that can load skills | Yes | Claude Code, Claude desktop / Claude.ai custom skills, or any agent that reads Markdown instructions |
-| Web browsing | Yes | To verify price, fare class and refund terms on the airline site |
-| A fare search source | Recommended | Any search tool or MCP server |
-| Web search | Recommended | To check current rules (entry, passenger rights, time zones) at run time |
-| File write | Optional | For the requirements doc and result file (Thorough mode) |
-| Airline accounts or API keys | Not needed | The agent never logs in, books or pays |
+# Try in Claude Code, Claude.ai, and the API
 
-## Install
+## Claude Code
+
+Register this repository as a plugin marketplace in Claude Code:
+
+```
+/plugin marketplace add ArthurDJ/flight-trip-planning
+```
+
+Then install one language version:
+
+```
+/plugin install flight-trip-planning@flight-trip-planning
+/plugin install flight-trip-planning-zh@flight-trip-planning
+```
+
+Or copy a skill folder into your personal skills directory:
 
 ```bash
 git clone https://github.com/ArthurDJ/flight-trip-planning.git
 mkdir -p ~/.claude/skills
-# English
-cp -r flight-trip-planning/skills/flight-trip-planning ~/.claude/skills/
-# or Chinese
-cp -r flight-trip-planning/skills/flight-trip-planning-zh ~/.claude/skills/
+cp -r flight-trip-planning/skills/flight-trip-planning ~/.claude/skills/      # English
+cp -r flight-trip-planning/skills/flight-trip-planning-zh ~/.claude/skills/   # or Chinese
 ```
 
-Install one language version. On Claude.ai, zip the folder and upload it as a custom skill.
+## Claude.ai
 
-## Repository layout
+Zip one skill folder (`flight-trip-planning` or `flight-trip-planning-zh`) and upload it as a custom skill. See [Using skills in Claude](https://support.claude.com/en/articles/12512180-using-skills-in-claude).
+
+## Claude API
+
+Custom skills can be uploaded and used through the Claude API. See the [Skills API Quickstart](https://docs.claude.com/en/api/skills-guide#creating-a-skill). The API only gives the skill what your application provides: without a web-browsing tool, the skill labels every price as unverified.
+
+# Requirements
+
+| Item | Required? | Notes |
+|---|---|---|
+| An agent that can load skills | Yes | Claude Code, Claude.ai custom skills, the Claude API, or any agent that reads Markdown instructions |
+| Web browsing | Strongly recommended | To verify price, fare class and refund terms on the airline site. Without it, the skill works from results you paste and labels every price unverified |
+| A fare search source | Recommended | Any search tool or MCP server, or results you paste |
+| Web search | Recommended | To recheck time-sensitive rules (entry rules, passenger rights, time zones) at run time |
+| File write | Optional | For the requirements doc and result file in Thorough mode |
+| Airline accounts or API keys | Not needed | The agent never logs in, books or pays |
+
+# Limitations and safety
+
+- **Query only.** The agent never books, pays, holds seats, logs in or enters credentials. It skips login and verification pages and leaves the booking to you.
+- **Prices are leads until verified** on the airline's own site. Without a browser, nothing is verified, and the skill says so.
+- **Rules change.** Baggage fees, refund policies, entry requirements and time zones change. Time-sensitive facts carry a "verified on" date and a source in `references/regions.md`, and the skill rechecks them at run time when it can.
+- **North America is covered in depth**; other regions have starter checklists.
+- Not legal, immigration or financial advice.
+
+# Upgrading from v1
+
+Version 1 was a Chinese skill named `flight-trip-planning`. Since version 2, that name belongs to the **English** skill, and the Chinese skill is `flight-trip-planning-zh`.
+
+- If you installed v1 and want Chinese: delete `~/.claude/skills/flight-trip-planning` (the old v1 copy), then install `flight-trip-planning-zh`. Otherwise you keep the outdated v1 rules next to the new skill, and both can trigger.
+- If you want English: replace `~/.claude/skills/flight-trip-planning` with the new folder.
+- On Claude.ai: delete the old custom skill before uploading the new one.
+- To see which version is installed, look for `version` under `metadata` in the SKILL.md frontmatter. v1 and v2 have no version there.
+
+# Repository layout
 
 ```
+.claude-plugin/marketplace.json   Claude Code plugin marketplace
 skills/
-  flight-trip-planning/        English
-    SKILL.md                   workflow, modes, rules, outputs
+  flight-trip-planning/           English skill
+    SKILL.md                      workflow by mode, scope, rules, outputs
     references/
-      decision-framework.md    true total cost, profiles, flexibility math, price dynamics, cards
-      verification.md          airline-site checks, backward planning, connections, time zones, audit
-      regions.md               global checks, North America module, other regions
-      templates.md             intake, requirements doc, comparison card, traveler summary, handoff, booking checks
-  flight-trip-planning-zh/     Chinese, same structure
+      decision-framework.md       true total cost, profiles, break-even test, price dynamics
+      verification.md             airline-site checks, connection time, connections, time zones, audit
+      regions.md                  dated facts with sources, North America module, other regions
+      scenarios.md                one-way vs round trip, multi-city, families, last-minute, several travelers
+      templates.md                intake, cards, traveler summary, handoff, booking checklists
+    LICENSE.txt
+  flight-trip-planning-zh/        Chinese skill, same structure
+evals/                            test cases and trigger queries
+scripts/check_parity.py           checks that the English and Chinese files match
 ```
 
-## Caveats
+# Testing
 
-Baggage fees, refund policies, entry requirements and time-zone rules change. The skill tells the agent to verify against official sources at run time and to label anything unverified. This is not legal, immigration or financial advice.
+- `python scripts/check_parity.py` compares the English and Chinese skill files, and this README with `README.zh-CN.md` and `README.zh-TW.md`: heading structure, every number, and cross-references. It exits with an error on any mismatch.
+- `evals/` holds 8 test cases in the `claude plugin eval` layout and `evals/trigger-queries.json` with 20 queries for testing the description. To run the cases against one language version, copy `evals/` into that skill folder and run `claude plugin eval .` from there.
 
-## License
+# License
 
-MIT
-
----
-
-## 中文说明
-
-**当"最便宜"不是正确答案时，用来决定该订哪张机票的 Claude skill。**
-
-专门处理搜索引擎不管的四种情况：
-
-| 情况 | skill 做什么 |
-|---|---|
-| **计划可能变**（签证或移民审批未定、工作学业日期、家庭安排） | 给灵活性定价：可退 vs credit vs 基础票，附盈亏平衡判断 |
-| **退款必须退现金**（要搬家、很少再坐这家航司） | 区分"退回原支付方式"和"航司 credit"，并判断 credit 是否真用得上 |
-| **跨境行程** | 检查入境证件、在哪过海关、预清关、转机时是否要重新托运、每天一班的稀缺航段、两地时差 |
-| **替别人订票** | 给旅客一份大白话精简版，给订票人一份可核对的结果 |
-
-它**不搜票、不预测价格、不代订**，而是建立在这些工具之上，把搜索结果变成决策。
-
-- 三种模式：快速（简单境内行程）/ 标准（上述任一情况）/ 详细（需求文档、完整结果、第二个 agent 审核）
-- 五个偏好档位：省钱 / 均衡 / 舒适 / 计划不确定 / 家庭，每档写明"多付多少钱换什么值得"
-- 推荐前 3 名，每条用金额写取舍；出票后核对确认页
-- 执行边界：只查询，不下单、不付款、不登录
-
-安装：把 `skills/flight-trip-planning-zh` 复制到 `~/.claude/skills/`（中文版），或复制 `skills/flight-trip-planning`（英文版），二选一。
+MIT. See [LICENSE](LICENSE); each skill folder also contains a copy as `LICENSE.txt`.

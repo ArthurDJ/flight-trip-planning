@@ -4,7 +4,7 @@
 
 Ask only what changes the decision. Offer the default in brackets so the person can just say "yes".
 
-**Quick mode (3–5 questions)**
+**Quick mode**: what you need to know. Take the answers from the message; ask only the ones it leaves out (usually 0–2) and state the defaults you used.
 1. Who is flying, from where to where, which dates? [1 adult, economy]
 2. How likely is it that the trip changes or is cancelled? [low → Balanced profile]
 3. Bags each way? [carry-on only]
@@ -45,12 +45,33 @@ H8 Documents (complete before ticketing or before departure; say which)
 
 Each filter must be checkable (a number, a zone, a method). Filters must not contradict each other.
 
-## 3. Comparison card (all modes)
+## 3. Comparison cards
 
-| # | Flights (operator) | Out: dep → arr (both zones) | Back: dep → arr (both zones) | Connection / risk | Class | Fare | Bags | **Total** | Trade-off |
-|---|---|---|---|---|---|---|---|---|---|
+### Compact card (Quick)
 
-Then: the recommendation in one sentence, why the next two lost in money terms, what was excluded and why (short).
+At most 3 options, one block each:
+
+```
+1. <airline and flight> · <total> (<fare> + <bags>) · <fare class, change / cancel in a few words>
+   <day dep → arr>, <nonstop | 1 stop in X, connection length>
+   Trade-off: <one line in money>
+```
+
+Times in one zone when both airports share it; otherwise "local (other)". Then the recommendation in one sentence. No exclusion list unless the person asks.
+
+### Comparison card (Standard and Thorough)
+
+| # | Flights (operator) | Out: dep → arr (both zones) | Back: dep → arr (both zones) | Connection / risk | Class | Basis | Fare | Bags | **Total** | Trade-off |
+|---|---|---|---|---|---|---|---|---|---|---|
+
+Basis: one-way or round trip, one booking or separate bookings. Then: the recommendation in one sentence, why the next two lost in money terms, what was excluded and why (short).
+
+### Multi-city and open-jaw card
+
+| # | Segment 1: dep → arr | Segment 2: dep → arr | Segment 3: dep → arr | Ground legs (time, cost) | Booking (one or separate) | Class | **Total** | Trade-off |
+|---|---|---|---|---|---|---|---|---|
+
+Add or drop segment columns as needed. The ground legs between open-jaw points are part of the true total.
 
 ## 4. Traveler summary (Standard+)
 
@@ -78,7 +99,7 @@ Fixed sections, "none" when empty:
 
 ## 7. Booking checklist (for the person)
 
-1. Open the airline site in your own browser and select the exact flights
+1. Open the airline site in your own browser and select the exact flights. If the agent could not verify on the airline site, check the price, fare class and bags there now
 2. Choose the fare family that matches the decision (and the refundable add-on if chosen); confirm the total
 3. Passenger name exactly as in the passport
 4. Choose the payment card (refunds return to it)

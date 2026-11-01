@@ -1,0 +1,30 @@
+{
+  "name": "flight-trip-planning",
+  "owner": {
+    "name": "ArthurDJ"
+  },
+  "metadata": {
+    "description": "Flight decision skill for Claude, in English and Chinese",
+    "version": "3.0.0"
+  },
+  "plugins": [
+    {
+      "name": "flight-trip-planning",
+      "description": "Decide which flight or fare to book: true total cost, priced flexibility, connection and border checks, airline-site verification. English instructions.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/flight-trip-planning"
+      ]
+    },
+    {
+      "name": "flight-trip-planning-zh",
+      "description": "Decide which flight or fare to book: true total cost, priced flexibility, connection and border checks, airline-site verification. Chinese instructions.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/flight-trip-planning-zh"
+      ]
+    }
+  ]
+}

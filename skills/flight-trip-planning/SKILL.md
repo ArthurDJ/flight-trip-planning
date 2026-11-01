@@ -1,13 +1,16 @@
 ---
 name: flight-trip-planning
-description: Decide which flight to book when plans may change, refunds must come back as cash, the trip crosses a border, or you are booking for someone else. Compares true total cost, flexibility, connection feasibility and documents, then recommends. Not a fare search engine.
+description: Use this skill whenever someone needs to decide which flight or fare to book, compare flight options or fare types (basic vs main vs refundable), check whether a connection or a cross-border itinerary works, or review flight options that another person or agent found. This includes simple requests like "find me a reasonable flight from X to Y". It matters most when plans may change, a refund must come back as cash, the trip crosses a border (US/Canada preclearance, customs, bag re-check), or someone is booking for another person. It verifies third-party prices on the airline's site, prices flexibility in money, and never books or pays. Not for hotels or full trip itineraries, and not for refund or compensation claims on a flight already booked or cancelled.
+license: MIT. LICENSE.txt has complete terms
+metadata:
+  version: "3.0.0"
 ---
 
 # Flight decision skill
 
 ## What this skill is for
 
-Search engines answer "what is the cheapest flight?". This skill answers **"which flight should we actually book?"** when the answer depends on things search engines ignore:
+Search engines answer "what is the cheapest flight?". This skill answers **"which flight should we actually book?"**, for simple trips (Quick mode) and especially when the answer depends on things search engines ignore:
 
 - **Plans that may change**: pending visas or immigration decisions, job or school dates, family events. Flexibility has a price, and this skill puts a number on it.
 - **Refunds that must come back as cash**, not airline credit (for example, the traveler is moving countries or rarely flies that airline).
@@ -16,17 +19,21 @@ Search engines answer "what is the cheapest flight?". This skill answers **"whic
 
 It turns these into hard filters and priced trade-offs, verifies the shortlist on the airline's own site, and hands over a decision. The person books and pays; the agent never does.
 
-## What this skill does NOT do (use existing tools)
+## Scope
+
+**Handled here**, with details in `references/scenarios.md`: one-way vs round trip, open-jaw and multi-city, families with bags, last-minute trips, several travelers on one booking, auditing another agent's result.
+
+**Not handled here.** Say so in one line and point to the right tool:
 
 | Need | Use instead |
 |---|---|
-| Live fare search, cheapest dates, nearby airports | Google Flights (date grid, price graph), Skyscanner, Kayak |
-| Price tracking and drop alerts | Google Flights / Google AI Mode "track prices", Kayak alerts |
-| Buy-or-wait prediction, price freeze | Hopper, Kayak price forecast (not guaranteed) |
-| Award / miles search | Airline sites, Google AI Mode miles, dedicated award tools |
-| Deciding refund vs credit vs claim **after** booking | A post-booking refund-decision skill |
+| Live fare search, cheapest dates, price tracking, buy-or-wait forecasts | Google Flights, Kayak, Skyscanner, Hopper (forecasts are not guaranteed) |
+| Award and points optimization | Airline sites and award tools; an award option the person already has can still be compared (`references/scenarios.md` → Award and points options) |
+| Hidden-city, "hacker fare" or self-transfer tricks | Excluded by default |
+| Hotels, full itineraries | Out of scope |
+| Refund, credit or compensation claims **after** booking or after an airline cancellation | A post-booking refund-decision skill; mention the airline-cancellation refund right if it applies (`references/regions.md` → Dated facts) |
 
-Treat these tools as **discovery**. Their results are leads, never final prices.
+Treat search tools as **discovery**. Their results are leads, never final prices.
 
 ## Modes
 
@@ -34,23 +41,34 @@ Pick the lightest mode that fits. Escalate only when a trigger appears.
 
 | Mode | When | Questions | Output |
 |---|---|---|---|
-| **Quick** (default for simple trips) | Domestic, fixed dates, no special constraints | 3–5 | Top 3 comparison card + recommendation |
+| **Quick** (default for simple trips) | Domestic, fixed dates, no special constraints | 0–2: only what the message leaves out | Compact card (top 3) + recommendation |
 | **Standard** | Any of: uncertain plans, cross-border, booking for others, more than 2 travelers | 6–10 | Comparison table, trade-off notes, traveler summary |
 | **Thorough** | High stakes, many date/airport combinations, or a second agent will audit | Full intake | Versioned requirements doc, full result file, audit, booking record |
 
 Escalation triggers: the traveler might cancel; a border is crossed; a connection depends on a once-a-day flight; immigration or visa status is pending; the person asks for a review of another agent's work.
 
-## Workflow
+## Workflow by mode
 
-1. **Intake.** Ask only what changes the decision. Use defaults for the rest and state them. See `references/templates.md` → Intake.
-2. **Choose a preference profile** (or let the person write their own). Profiles say how much extra money is worth what. See `references/decision-framework.md` → Profiles.
-3. **Set hard filters**: date and time windows (with the time zone named), maximum duration and stops, refundability class, baggage, single ticket, documents.
-4. **Discover** candidates with the person's search tool. Cover every date in the window and every time of day; work backwards from the scarcest leg (see `references/verification.md` → Backward planning).
-5. **Verify the shortlist on the airline site**: price, fare class, refund and change terms in the airline's words, query time. See `references/verification.md`.
-6. **Normalize to true total cost** and **price the flexibility** (refundable vs credit vs basic). See `references/decision-framework.md`.
-7. **Assess feasibility**: each connection step, border rules, documents, time zones, scarce-leg risk. Apply the region module that fits (`references/regions.md`).
-8. **Decide and explain**: top 3 with the trade-off in money ("pays $27 more to arrive in daylight"), plus why the cheaper or closer options lost.
-9. **Hand over**: traveler summary, a self-contained message for any other agent, and a booking checklist. After the person books, run the **post-booking check**.
+| Step | Quick | Standard | Thorough |
+|---|---|---|---|
+| 1. Intake (`references/templates.md` → Intake) | Infer from the message; ask only what is missing and changes the decision; state defaults | Standard questions | Full intake + requirements doc |
+| 2. Profile (`references/decision-framework.md` → Preference profiles) | Balanced unless the person says otherwise | Choose with the person | Choose, write the exchange rates down |
+| 3. Hard filters | Dates, times, bags | + refundability, documents, single ticket | + per-date limits, max duration and stops |
+| 4. Discover | One search pass for the given dates | Every date and time of day; backward planning (`references/verification.md` → Backward planning) | + every acceptable airport; price matrix |
+| 5. Verify on the airline site (`references/verification.md` → Verify on the airline site) | Recommended option and runner-up | Every shortlisted option | Every shortlisted option + query log |
+| 6. True total and flexibility (`references/decision-framework.md`) | Fare + bags; break-even only if plans may change | Full true total; break-even test | Same, with inputs written out |
+| 7. Feasibility (`references/verification.md` → Connection assessment, `references/regions.md`) | Connection steps, only if there is a connection | + border rules, documents, time zones | Same, both directions weighed |
+| 8. Decide and explain | Top 3, trade-off in money | Same + why cheaper or closer options lost | Same |
+| 9. Hand over (`references/templates.md`) | Compact card | + traveler summary, booking checklist | + full result file, audit, post-booking check |
+
+Quick mode stays short. Budget: about 250 words in total, made of the compact card, a one-sentence recommendation, at most 2 questions (only ones whose answer would change the pick) and at most 2 short notes. No requirements doc, no region module unless a rule applies, and no booking checklist: offer it in one line instead.
+
+## When tools are missing
+
+- **No flight search tool**: ask the person to paste results, links or screenshots, and work from those.
+- **No browser**: prices cannot be checked on the airline site. Label every price "provided by you, not verified on the airline site", say what could change (fare class, bags, taxes), and give the booking checklist (`references/templates.md` → Booking checklist) so the person checks before paying.
+- **No web search**: use the rules in `references/regions.md` with their "verified on" dates and say that they must be rechecked.
+- In every case, do not fill gaps from memory: no invented flight numbers, times, prices or fees. A typical schedule can be described only as "typical, unverified".
 
 ## Core rules
 
@@ -66,7 +84,8 @@ Escalation triggers: the traveler might cancel; a border is crossed; a connectio
 
 ## Outputs
 
-- **Comparison card** (all modes): top 3, true total, refundability class, times in both zones, connection time and risk, one-line trade-off each.
+- **Compact card** (Quick): top 3, true total, refundability class, times, connection, one-line trade-off each.
+- **Comparison card** (Standard+): adds both time zones, connection risk and the basis of each price.
 - **Traveler summary** (Standard+): plain language, top 3 only, 3–5 notes (how to cancel, bags, documents).
 - **Handoff message** (when another agent is involved): self-contained; never refer to files the other agent cannot open.
 - **Full result file and audit** (Thorough).
@@ -76,7 +95,8 @@ Templates are in `references/templates.md`.
 
 ## Reference files
 
-- `references/decision-framework.md`: true total cost, preference profiles, flexibility math, price dynamics, payment cards.
-- `references/verification.md`: airline-site verification, backward planning, connection assessment, time zones, audit checklist.
-- `references/regions.md`: global checks, North America module (US domestic, Canada domestic, US ⇄ Canada), other regions.
-- `references/templates.md`: intake questions, requirements doc, comparison card, traveler summary, handoff message, booking and post-booking checklists.
+- `references/decision-framework.md`: true total cost, preference profiles with exchange rates, the break-even test, price dynamics, payment cards.
+- `references/verification.md`: airline-site verification, minimum connection time, backward planning, connection assessment, time zones, audit checklist.
+- `references/regions.md`: dated facts with sources, global checks, North America module (US domestic, Canada domestic, US ⇄ Canada), other regions.
+- `references/scenarios.md`: one-way vs round trip, open-jaw and multi-city, families and bags, last-minute, several travelers, award options, price tracking.
+- `references/templates.md`: intake questions, requirements doc, compact and comparison cards, multi-city card, traveler summary, handoff message, booking and post-booking checklists.

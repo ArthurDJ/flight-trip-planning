@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: post-booking-cancellation-out-of-scope
+expected_outcome: |
+  Recognises a post-booking question: says that when the airline cancels and the passenger declines the alternative, US rules give a refund rather than only a credit, even on a non-refundable ticket; advises asking for the refund; does not run the flight comparison workflow.
