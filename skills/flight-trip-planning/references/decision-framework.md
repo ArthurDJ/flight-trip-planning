@@ -83,6 +83,7 @@ Questions that set `f` (the share of credit that would go unused):
 - "Free change" means no change fee, not no fare difference. The difference is computed on the day you change.
 - Premium economy, business and first are **not automatically refundable**; many airlines sell non-refundable versions.
 - Partial use: whether an unused return leg is refunded depends on the fare rules.
+- If the airline cancels or significantly changes the flight, a refund can be due even on a non-refundable fare (US: see `references/regions.md` → Dated facts). Do not count on it when choosing a fare: it depends on what the airline does, not on the traveler.
 - Many countries have a short free-cancellation window right after booking (e.g. the US 24-hour rule for bookings made directly with the airline). Use it as a final check.
 
 ## 4. Price dynamics
