@@ -140,12 +140,26 @@ skills/
   flight-trip-planning-zh/        中文版 skill，結構相同
 evals/                            測試案例和觸發測試查詢
 scripts/check_parity.py           檢查中英文檔案是否一致
+scripts/validate_skills.py        檢查 SKILL.md frontmatter、檔案參照、marketplace.json 和 evals
+.github/                          CI 工作流程、issue 表單、pull request 範本
 ```
 
 # 測試
 
 - `python scripts/check_parity.py` 比較中英文 skill 檔案，以及 `README.md`、`README.zh-CN.md` 和本檔案：標題結構、每個數字和交叉參照。只要有任何不一致，就回報錯誤並結束。
 - `evals/` 裡有 8 個依 `claude plugin eval` 格式撰寫的測試案例，`evals/trigger-queries.json` 有 20 條用來測試 description 的查詢。要對某個語言版本執行這些案例，把 `evals/` 複製到該 skill 資料夾，並在那裡執行 `claude plugin eval .`。
+- `python scripts/validate_skills.py` 依 [Agent Skills 規格](https://agentskills.io/specification) 檢查兩個 SKILL.md（name 與資料夾同名、description 長度、`license`、`metadata` 只含字串），檢查 skill 裡每個 `references/` 路徑和相對連結都存在、`.claude-plugin/marketplace.json` 以存在的路徑列出每個 skill 資料夾、兩個 SKILL.md、`marketplace.json` 和 `CHANGELOG.md` 的版本號一致，以及每個測試案例都有 `prompt.md`、`case.yaml` 和 graders。只要有任何問題，就回報錯誤並結束。
+
+# 參與貢獻
+
+每個 pull request 和每次推送到 `main` 時，GitHub Actions 都會執行這兩個指令碼（`.github/workflows/ci.yml`）。它們只需要 Python 和標準函式庫，推送前請先在本機執行：
+
+```bash
+python scripts/check_parity.py
+python scripts/validate_skills.py
+```
+
+中英文 skill 和三個 README 要在同一個 pull request 裡一起修改。修改規則需要官方來源，並更新「带日期的事实」表（中文版）和「Dated facts」表（英文版）中的核實日期；完整清單請參閱 pull request 範本。規則過時，或 skill 該觸發時沒有觸發、不該觸發時卻觸發了，請使用 issue 表單回報。
 
 # 授權條款
 

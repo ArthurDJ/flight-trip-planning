@@ -140,12 +140,26 @@ skills/
   flight-trip-planning-zh/        Chinese skill, same structure
 evals/                            test cases and trigger queries
 scripts/check_parity.py           checks that the English and Chinese files match
+scripts/validate_skills.py        checks SKILL.md frontmatter, file references, marketplace.json and evals
+.github/                          CI workflow, issue forms, pull request template
 ```
 
 # Testing
 
 - `python scripts/check_parity.py` compares the English and Chinese skill files, and this README with `README.zh-CN.md` and `README.zh-TW.md`: heading structure, every number, and cross-references. It exits with an error on any mismatch.
 - `evals/` holds 8 test cases in the `claude plugin eval` layout and `evals/trigger-queries.json` with 20 queries for testing the description. To run the cases against one language version, copy `evals/` into that skill folder and run `claude plugin eval .` from there.
+- `python scripts/validate_skills.py` checks both SKILL.md files against the [Agent Skills specification](https://agentskills.io/specification) (the name matches the folder, description length, `license`, string-only `metadata`), that every `references/` path and relative link in a skill exists, that `.claude-plugin/marketplace.json` lists every skill folder by a path that exists, that the version is the same in both SKILL.md files, `marketplace.json` and `CHANGELOG.md`, and that every eval case has `prompt.md`, `case.yaml` and graders. It exits with an error on any problem.
+
+# Contributing
+
+GitHub Actions runs both scripts on every pull request and on every push to `main` (`.github/workflows/ci.yml`). They need only Python and its standard library, so run them before pushing:
+
+```bash
+python scripts/check_parity.py
+python scripts/validate_skills.py
+```
+
+Change the English and Chinese skills, and the three READMEs, in the same pull request. A rule change needs an official source and a new "verified on" date in the "Dated facts" table; the pull request template has the full checklist. To report a rule that is out of date or a skill that loads when it should not (or does not load when it should), use the issue forms.
 
 # License
 

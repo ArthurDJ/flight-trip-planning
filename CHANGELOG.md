@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+Repository only; the skills are unchanged, so `metadata.version` stays 3.0.0.
+- `scripts/validate_skills.py`: checks both SKILL.md files against the Agent Skills specification (name matches the folder, name and description rules, allowed fields, `license`, string-only `metadata`), that every `references/` path and relative link exists and every reference file is mentioned in SKILL.md, that `.claude-plugin/marketplace.json` is valid and lists every skill folder, that the version agrees across SKILL.md, `marketplace.json` and `CHANGELOG.md`, and the `evals/` layout. Standard library only.
+- GitHub Actions (`.github/workflows/ci.yml`) runs `check_parity.py` and `validate_skills.py` on pull requests and pushes to `main`.
+- Issue forms (rule out of date, triggering problem, bug or feature request) and a pull request template with the en/zh, source, changelog, version and eval checklist.
+- README: "Contributing" section, in all three languages.
+
 ## 3.0.0 — 2026-11-01
 
 Behavior changes (the same input can now get a different recommendation):

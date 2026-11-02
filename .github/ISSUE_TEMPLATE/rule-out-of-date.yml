@@ -1,0 +1,55 @@
+name: Rule out of date
+description: A fee, policy, entry rule, time zone or other fact in the skill no longer matches the official source.
+title: "[Rule] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Time-sensitive facts live in the "Dated facts" table in `references/regions.md`, each with a source and a "verified on" date. A report needs an **official** source (airline, government or regulator page), not a blog or forum post.
+  - type: dropdown
+    id: file
+    attributes:
+      label: Which file
+      description: Where the rule is written. The English and Chinese skills have the same files and both get fixed.
+      options:
+        - references/regions.md
+        - references/verification.md
+        - references/decision-framework.md
+        - references/scenarios.md
+        - references/templates.md
+        - SKILL.md
+        - README
+    validations:
+      required: true
+  - type: input
+    id: rule
+    attributes:
+      label: Which rule
+      description: The row, heading or sentence, quoted or named.
+      placeholder: 'Dated facts: "British Columbia on permanent UTC-7 from 2026-11-01"'
+    validations:
+      required: true
+  - type: textarea
+    id: change
+    attributes:
+      label: What changed
+      description: What the skill says now, and what the official source says instead. Include the date the change takes effect if there is one.
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Official source URL
+      description: The airline, government or regulator page that states the current rule.
+      placeholder: https://
+    validations:
+      required: true
+  - type: input
+    id: checked
+    attributes:
+      label: Date checked
+      description: When you read the source (YYYY-MM-DD).
+      placeholder: "2026-11-01"
+    validations:
+      required: true
